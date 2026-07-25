@@ -1,2 +1,0 @@
-Listen me, what we have to do is. Run the server inside docker container.
-Map the random Unreserved. Port to containers. port mapping. where the server is running. Then start ngrok for url to the same port of host. That is all.
