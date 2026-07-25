@@ -1,13 +1,31 @@
+import asyncio
 import logging
 from typing import Any
 
+from httpcore import ConnectTimeout as HttpcoreConnectTimeout
+from httpx import ConnectError, ConnectTimeout, ReadTimeout, WriteTimeout
 from telegram import Update
-from telegram.ext import Application, ContextTypes, MessageHandler, filters
+from telegram.error import Conflict
+from telegram.ext import (
+    Application,
+    CallbackQueryHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
 
 from app.config.settings import settings
 from app.gateway.telegram.handler import TelegramMessageHandler
 
 logger = logging.getLogger(__name__)
+
+IGNORED_NETWORK_EXCEPTIONS = (
+    ConnectTimeout,
+    ConnectError,
+    ReadTimeout,
+    WriteTimeout,
+    HttpcoreConnectTimeout,
+)
 
 
 class TelegramGateway:
@@ -25,7 +43,6 @@ class TelegramGateway:
             self.application.add_handler(
                 MessageHandler(filters.ALL, self.message_handler.handle_message)
             )
-            from telegram.ext import CallbackQueryHandler
             self.application.add_handler(
                 CallbackQueryHandler(self.message_handler.handle_callback_query)
             )
@@ -38,22 +55,10 @@ class TelegramGateway:
         error = context.error
         
         # Ignore common transient network/timeout exceptions to prevent logging spam
-        from httpx import ConnectTimeout, ConnectError, ReadTimeout, WriteTimeout
-        from httpcore import ConnectTimeout as HttpcoreConnectTimeout
-        
-        ignored_exceptions = (
-            ConnectTimeout,
-            ConnectError,
-            ReadTimeout,
-            WriteTimeout,
-            HttpcoreConnectTimeout,
-        )
-        if isinstance(error, ignored_exceptions):
+        if isinstance(error, IGNORED_NETWORK_EXCEPTIONS):
             logger.warning(f"Telegram client network/timeout exception encountered: {error}")
             return
             
-        from telegram.error import Conflict
-        import asyncio
         if isinstance(error, Conflict):
             logger.error("Conflict detected (another bot instance is running). Shutting down this instance to prevent endless loop...")
             asyncio.create_task(self.shutdown())

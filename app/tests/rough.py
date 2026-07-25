@@ -1,5 +1,9 @@
+import os
 import sys
+import time
 from pathlib import Path
+
+import requests
 
 # Reconfigure stdout to handle unicode prints safely on Windows terminal
 if sys.platform.startswith("win"):
@@ -15,39 +19,38 @@ if env_path.exists():
         line = line.strip()
         if line and not line.startswith("#") and "=" in line:
             key, val = line.split("=", 1)
-            val = val.strip().strip("'\"")
-            import os
-            os.environ[key.strip()] = val
+            os.environ[key.strip()] = val.strip().strip("'\"")
 
 from app.tools.sandbox.commands import (  # noqa: E402
-    execute_bash_command,
-    execute_python_code,
-    execute_node_code,
     start_sandbox_server,
     stop_sandbox_server,
-    get_sandbox_preview,
 )
-
-#print(execute_bash_command.invoke({"command": "mkdir mydir ; ls"}))
 
 config = {"configurable": {"thread_id": "tg-1833617010"}}
 
 print("Stopping any existing server on port 3000...")
-print(stop_sandbox_server.invoke({'port': 3000}, config=config))
+print(stop_sandbox_server.invoke({"port": 3000}, config=config))
 
 print("Starting server on port 3000...")
-print(start_sandbox_server.invoke({'get_preview': True, 'port': 3000, 'command': 'cd /workspace/react-app && npm start'}, config=config))
+print(
+    start_sandbox_server.invoke(
+        {
+            "get_preview": True,
+            "port": 3000,
+            "command": "cd /workspace/react-app && npm start",
+        },
+        config=config,
+    )
+)
 
-import time
-print("Starting server on port 3000...")
-print(start_sandbox_server.invoke({'get_preview': True, 'port': 3000, 'command': 'cd /workspace/react-app && npm start'}, config=config))
 print("Waiting 15s for React dev server to finish compiling...")
 time.sleep(15)
-import requests
-# Include the Ngrok-Skip-Browser-Warning header so ngrok bypasses its free-tier warning page
+
 headers = {"Ngrok-Skip-Browser-Warning": "true"}
-response = requests.get('https://nonadeptly-subconsular-verdie.ngrok-free.dev', headers=headers, verify=False)
+response = requests.get(
+    "https://nonadeptly-subconsular-verdie.ngrok-free.dev",
+    headers=headers,
+    verify=False,
+)
 print("Preview Response:", response)
 print("Status Code:", response.status_code)
-print("Keeping the script alive for 300 seconds so ngrok stays online...")
-time.sleep(300)

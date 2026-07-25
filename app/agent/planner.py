@@ -1,5 +1,4 @@
 import logging
-import os
 import time
 
 from langchain_core.messages import SystemMessage, ToolMessage, HumanMessage
@@ -141,7 +140,6 @@ def planner(state: AgentState) -> dict:
         try:
             start_time = time.time()
             response = llm_with_tools.invoke(processed_messages)
-            print("sent message on call - ", processed_messages)
             duration = time.time() - start_time
             logger.info(f"[time] LLM execution completed in {duration:.3f}s (attempt {attempt}/{max_retries})")
             analyze_and_log_tokens(processed_messages, response)
