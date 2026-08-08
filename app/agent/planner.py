@@ -139,7 +139,9 @@ def planner(state: AgentState) -> dict:
     for attempt in range(1, max_retries + 1):
         try:
             start_time = time.time()
+          #  print (processed_messages)
             response = llm_with_tools.invoke(processed_messages)
+            #response="ok"
             duration = time.time() - start_time
             logger.info(f"[time] LLM execution completed in {duration:.3f}s (attempt {attempt}/{max_retries})")
             analyze_and_log_tokens(processed_messages, response)
