@@ -1,0 +1,368 @@
+{
+  "total_queries": 100,
+  "task_decomposition": {
+    "single_task_count": 56,
+    "multi_task_count": 44,
+    "average_tasks_per_query": 1.81,
+    "max_tasks_in_query": 4
+  },
+  "tool_routing": {
+    "no_tool_group_count": 8,
+    "single_tool_group_count": 55,
+    "multi_tool_group_count": 37,
+    "average_tool_groups_per_query": 1.39,
+    "max_tool_groups_in_query": 3,
+    "tool_group_routing_frequency": {
+      "browser": 16,
+      "calendar": 19,
+      "coding": 25,
+      "gmail": 27,
+      "memory": 18,
+      "sandbox": 17,
+      "web": 17
+    }
+  },
+  "decomposition_vs_routing_matrix": {
+    "single_task_no_tool": 8,
+    "single_task_single_tool_group": 48,
+    "multi_task_single_tool_group": 7,
+    "multi_task_multi_tool_group": 37
+  },
+  "token_optimization_insight": {
+    "multi_task_single_group_queries": 7,
+    "percentage_multi_tasks_saving_tool_tokens": "15.9%",
+    "description": "Multi-action user requests that consolidate down to a single tool group, saving token context by avoiding loading unnecessary tool schemas."
+  },
+  "examples": {
+    "single_task": [
+      {
+        "id": 1,
+        "query": "Find the email from Cisco about my interview.",
+        "classification": "single",
+        "tasks": [
+          "Find the email from Cisco about my interview."
+        ],
+        "required_tool_groups": [
+          "gmail"
+        ]
+      },
+      {
+        "id": 2,
+        "query": "What did we discuss about SalesAkart?",
+        "classification": "single",
+        "tasks": [
+          "Retrieve conversation and project notes about SalesAkart from memory."
+        ],
+        "required_tool_groups": [
+          "memory"
+        ]
+      },
+      {
+        "id": 3,
+        "query": "Check whether I am free tomorrow.",
+        "classification": "single",
+        "tasks": [
+          "Check calendar events and availability for tomorrow."
+        ],
+        "required_tool_groups": [
+          "calendar"
+        ]
+      },
+      {
+        "id": 4,
+        "query": "Search the web for the latest Next.js release.",
+        "classification": "single",
+        "tasks": [
+          "Search the web for news and notes on the latest Next.js release."
+        ],
+        "required_tool_groups": [
+          "web"
+        ]
+      },
+      {
+        "id": 5,
+        "query": "List the files in my workspace.",
+        "classification": "single",
+        "tasks": [
+          "List files and directories in the workspace."
+        ],
+        "required_tool_groups": [
+          "coding"
+        ]
+      }
+    ],
+    "multi_task_single_tool_group": [
+      {
+        "id": 57,
+        "query": "Find the Cisco interview email and reply to it saying I am available tomorrow.",
+        "classification": "multi",
+        "task_count": 2,
+        "tasks": [
+          {
+            "task": "Find the Cisco interview email.",
+            "tool_groups": [
+              "gmail"
+            ]
+          },
+          {
+            "task": "Reply to the email saying I am available tomorrow.",
+            "tool_groups": [
+              "gmail"
+            ]
+          }
+        ],
+        "required_tool_groups": [
+          "gmail"
+        ]
+      },
+      {
+        "id": 59,
+        "query": "Search my Gmail for the invoice and save the attachment.",
+        "classification": "multi",
+        "task_count": 2,
+        "tasks": [
+          {
+            "task": "Search Gmail for the invoice email.",
+            "tool_groups": [
+              "gmail"
+            ]
+          },
+          {
+            "task": "Download and save the invoice attachment.",
+            "tool_groups": [
+              "gmail"
+            ]
+          }
+        ],
+        "required_tool_groups": [
+          "gmail"
+        ]
+      },
+      {
+        "id": 61,
+        "query": "Find the bug, fix it, and run the tests.",
+        "classification": "multi",
+        "task_count": 3,
+        "tasks": [
+          {
+            "task": "Find the bug in the codebase.",
+            "tool_groups": [
+              "coding"
+            ]
+          },
+          {
+            "task": "Fix the identified bug in code.",
+            "tool_groups": [
+              "coding"
+            ]
+          },
+          {
+            "task": "Run the test suite to verify the fix.",
+            "tool_groups": [
+              "coding"
+            ]
+          }
+        ],
+        "required_tool_groups": [
+          "coding"
+        ]
+      },
+      {
+        "id": 65,
+        "query": "Open the project dashboard in the browser, log in with saved credentials, and take a screenshot.",
+        "classification": "multi",
+        "task_count": 3,
+        "tasks": [
+          {
+            "task": "Navigate browser to project dashboard page.",
+            "tool_groups": [
+              "browser"
+            ]
+          },
+          {
+            "task": "Perform login interaction on the dashboard page.",
+            "tool_groups": [
+              "browser"
+            ]
+          },
+          {
+            "task": "Capture screenshot of logged-in dashboard.",
+            "tool_groups": [
+              "browser"
+            ]
+          }
+        ],
+        "required_tool_groups": [
+          "browser"
+        ]
+      },
+      {
+        "id": 72,
+        "query": "Check if the dev server on port 8000 is running, stop it if active, and restart it with reload flag.",
+        "classification": "multi",
+        "task_count": 3,
+        "tasks": [
+          {
+            "task": "Check status of sandbox server on port 8000.",
+            "tool_groups": [
+              "sandbox"
+            ]
+          },
+          {
+            "task": "Stop active sandbox server on port 8000.",
+            "tool_groups": [
+              "sandbox"
+            ]
+          },
+          {
+            "task": "Start sandbox server with reload flag.",
+            "tool_groups": [
+              "sandbox"
+            ]
+          }
+        ],
+        "required_tool_groups": [
+          "sandbox"
+        ]
+      }
+    ],
+    "multi_task_multi_tool_group": [
+      {
+        "id": 58,
+        "query": "Create a portfolio app and start the server.",
+        "classification": "multi",
+        "task_count": 2,
+        "tasks": [
+          {
+            "task": "Create the portfolio application codebase.",
+            "tool_groups": [
+              "coding"
+            ]
+          },
+          {
+            "task": "Start the development server for the portfolio app.",
+            "tool_groups": [
+              "sandbox"
+            ]
+          }
+        ],
+        "required_tool_groups": [
+          "coding",
+          "sandbox"
+        ]
+      },
+      {
+        "id": 60,
+        "query": "Check my calendar and email me the available times.",
+        "classification": "multi",
+        "task_count": 2,
+        "tasks": [
+          {
+            "task": "Check calendar for free available times.",
+            "tool_groups": [
+              "calendar"
+            ]
+          },
+          {
+            "task": "Send an email containing the available times.",
+            "tool_groups": [
+              "gmail"
+            ]
+          }
+        ],
+        "required_tool_groups": [
+          "calendar",
+          "gmail"
+        ]
+      },
+      {
+        "id": 62,
+        "query": "Create the website, start the server, and give me the preview URL.",
+        "classification": "multi",
+        "task_count": 3,
+        "tasks": [
+          {
+            "task": "Create the website source code.",
+            "tool_groups": [
+              "coding"
+            ]
+          },
+          {
+            "task": "Start the preview server.",
+            "tool_groups": [
+              "sandbox"
+            ]
+          },
+          {
+            "task": "Obtain and return the preview URL.",
+            "tool_groups": [
+              "sandbox"
+            ]
+          }
+        ],
+        "required_tool_groups": [
+          "coding",
+          "sandbox"
+        ]
+      },
+      {
+        "id": 63,
+        "query": "Check my memory for our project roadmap, search the web for competitors, and summarize the differences.",
+        "classification": "multi",
+        "task_count": 3,
+        "tasks": [
+          {
+            "task": "Retrieve project roadmap details from memory.",
+            "tool_groups": [
+              "memory"
+            ]
+          },
+          {
+            "task": "Search the web for competitor products and features.",
+            "tool_groups": [
+              "web"
+            ]
+          },
+          {
+            "task": "Summarize the differences between our roadmap and competitors.",
+            "tool_groups": []
+          }
+        ],
+        "required_tool_groups": [
+          "memory",
+          "web"
+        ]
+      },
+      {
+        "id": 64,
+        "query": "Search Gmail for the Zoom link, check if I am free at that time, and accept the meeting.",
+        "classification": "multi",
+        "task_count": 3,
+        "tasks": [
+          {
+            "task": "Search Gmail for the email containing the Zoom link.",
+            "tool_groups": [
+              "gmail"
+            ]
+          },
+          {
+            "task": "Check calendar availability at the meeting time.",
+            "tool_groups": [
+              "calendar"
+            ]
+          },
+          {
+            "task": "Accept the meeting invitation on calendar.",
+            "tool_groups": [
+              "calendar"
+            ]
+          }
+        ],
+        "required_tool_groups": [
+          "calendar",
+          "gmail"
+        ]
+      }
+    ]
+  }
+}

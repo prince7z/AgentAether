@@ -75,7 +75,7 @@ for i, tool in enumerate(tools, 1):
 
     print(
         f"{i:02d}. {fn.get('name'):30} "
-        f"{len(serialized):5} chars"
+        f"{(serialized)}"
     )
 
 print("=" * 80)

@@ -28,6 +28,8 @@ class Settings:
 	summarizer_max_retries: int = int(os.getenv("SUMMARIZER_MAX_RETRIES", "2"))
 	openrouter_enable_json_mode: bool = os.getenv("OPENROUTER_ENABLE_JSON_MODE", "true").lower() in ("true", "1")
 	memory_duplicate_threshold: float = float(os.getenv("MEMORY_DUPLICATE_THRESHOLD", "0.85"))
+	enable_tool_router: bool = os.getenv("ENABLE_TOOL_ROUTER", "true").lower() in ("true", "1")
 
 
 settings = Settings()
+

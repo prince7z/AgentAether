@@ -129,7 +129,22 @@ def planner(state: AgentState) -> dict:
         processed_messages = [SystemMessage(content=SYSTEM_PROMPT)] + list(processed_messages)
 
     log_messages_sent(processed_messages)
-    logger.info(f"[llm_request] Calling LLM model: {OpenRouter_model}...")
+    
+    # Extract user query string from last HumanMessage for dynamic tool routing
+    user_query = ""
+    if last_human_idx != -1:
+        human_msg = messages[last_human_idx]
+        if isinstance(human_msg.content, str):
+            user_query = human_msg.content
+        elif isinstance(human_msg.content, list):
+            user_query = " ".join([str(item) for item in human_msg.content])
+
+    # Dynamically select tool groups using BGE Reranker Task Decomposition
+    from app.agent.router import route_tools_for_query
+    routed_tools, selected_groups = route_tools_for_query(user_query)
+    active_llm = llm.bind_tools(routed_tools) if routed_tools else llm
+
+    logger.info(f"[llm_request] Calling LLM model: {OpenRouter_model} with {len(routed_tools)} bound tools...")
 
     max_retries = 3
     initial_delay = 2.0
@@ -139,9 +154,7 @@ def planner(state: AgentState) -> dict:
     for attempt in range(1, max_retries + 1):
         try:
             start_time = time.time()
-          #  print (processed_messages)
-            response = llm_with_tools.invoke(processed_messages)
-            #response="ok"
+            response = active_llm.invoke(processed_messages)
             duration = time.time() - start_time
             logger.info(f"[time] LLM execution completed in {duration:.3f}s (attempt {attempt}/{max_retries})")
             analyze_and_log_tokens(processed_messages, response)

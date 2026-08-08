@@ -2,14 +2,26 @@
 
 import asyncio
 import logging
+from typing import TYPE_CHECKING, Any
 import httpx
 
 from app.config import Infinity_url
-from app.tools.search.schemas import Chunk
+
+if TYPE_CHECKING:
+    from app.tools.search.schemas import Chunk
 
 logger = logging.getLogger("openclaw-agent")
 
 _LOCAL_RERANKER_MODEL = None
+
+
+def _normalize_infinity_url(raw_url: str) -> str:
+    """Strips trailing paths like /rerank, /v1/rerank, /embeddings, etc. to get the root server URL."""
+    url = raw_url.rstrip("/")
+    for suffix in ["/rerank", "/v1/rerank", "/embeddings", "/v1/embeddings"]:
+        if url.endswith(suffix):
+            url = url[:-len(suffix)].rstrip("/")
+    return url
 
 
 def _get_local_reranker():
@@ -20,7 +32,7 @@ def _get_local_reranker():
     return _LOCAL_RERANKER_MODEL
 
 
-def local_rerank(query: str, chunks: list[Chunk], top_k: int = 4) -> list[Chunk]:
+def local_rerank(query: str, chunks: list[Any], top_k: int = 4) -> list[Any]:
     """Rerank chunks locally using sentence_transformers."""
     try:
         model = _get_local_reranker()
@@ -38,9 +50,9 @@ def local_rerank(query: str, chunks: list[Chunk], top_k: int = 4) -> list[Chunk]
 async def rerank_chunks(
     request_id: str,
     query: str,
-    chunks: list[Chunk],
+    chunks: list[Any],
     top_k: int = 5
-) -> list[Chunk]:
+) -> list[Any]:
     """Rerank chunks based on relevance to the query using the Infinity Reranker API.
 
     If the Infinity Reranker API fails, falls back to a local SentenceTransformers model.
@@ -63,31 +75,28 @@ async def rerank_chunks(
     # Map chunks to their text content
     document_texts = [chunk.content for chunk in chunks]
     response = None
+    last_error = "timeout or connection failure"
 
     if Infinity_url:
-        # Try standard /rerank first, fallback to /v1/rerank
-        endpoints = ["/rerank", "/v1/rerank"]
-        response = None
-        last_error = "timeout or connection failure"
+        base_url = _normalize_infinity_url(Infinity_url)
+        # Primary endpoint for Infinity Server is /rerank
+        url = f"{base_url}/rerank"
+        payload = {
+            "model": "BAAI/bge-reranker-base",
+            "query": query,
+            "documents": document_texts,
+            "top_n": top_k
+        }
         async with httpx.AsyncClient(timeout=5.0) as client:
-            for path in endpoints:
-                url = f"{Infinity_url.rstrip('/')}{path}"
-                payload = {
-                    "model": "BAAI/bge-reranker-base",
-                    "query": query,
-                    "documents": document_texts,
-                    "top_n": top_k
-                }
-                try:
-                    res = await client.post(url, json=payload)
-                    if res.status_code == 200:
-                        response = res
-                        break
-                    else:
-                        last_error = f"status {res.status_code}: {res.text}"
-                except Exception as exc:
-                    last_error = str(exc)
-                    logger.warning(f"Reranker failed on endpoint {url}: {exc}")
+            try:
+                res = await client.post(url, json=payload)
+                if res.status_code == 200:
+                    response = res
+                else:
+                    last_error = f"status {res.status_code}: {res.text}"
+            except Exception as exc:
+                last_error = str(exc)
+                logger.warning(f"Reranker failed on endpoint {url}: {exc}")
 
     if not response or response.status_code != 200:
         log_stage(

@@ -1,0 +1,17 @@
+{
+  "evaluation_time_seconds": 235.35,
+  "direct_reranking": {
+    "exact_set_accuracy": "70%",
+    "recall": "80.2%",
+    "precision": "80.2%"
+  },
+  "decomposed_task_reranking": {
+    "exact_set_accuracy": "80%",
+    "recall": "88.8%",
+    "precision": "89.8%"
+  },
+  "improvement": {
+    "accuracy_gain": "+10% points",
+    "recall_gain": "+8.7% points"
+  }
+}
