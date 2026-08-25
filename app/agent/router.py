@@ -98,6 +98,29 @@ TOOL_GROUP_DOCUMENTS = {
 }
 
 TOOL_GROUP_NAMES = list(TOOL_GROUP_DOCUMENTS.keys())
+
+# Keywords that indicate a coding‑related request
+CODING_KEYWORDS = [
+    "build",
+    "compile",
+    "run",
+    "test",
+    "execute",
+    "debug",
+    "code",
+    "script",
+    "make",
+    "install",
+    "deploy",
+    "package",
+]
+
+def contains_coding_keywords(query: str) -> bool:
+    """Return True if the query contains any coding‑related keyword.
+    Uses a simple word‑boundary regex for detection, case‑insensitive.
+    """
+    pattern = re.compile(r"\\b(" + "|".join(CODING_KEYWORDS) + r")\\b", re.IGNORECASE)
+    return bool(pattern.search(query))
 DOCUMENTS_LIST = [TOOL_GROUP_DOCUMENTS[name] for name in TOOL_GROUP_NAMES]
 
 COMMON_VERBS = [
@@ -173,6 +196,10 @@ def decompose_query_to_tasks(query: str) -> list[str]:
 
     return tasks if tasks else [query]
 
+# Helper to check for coding intent before reranking
+# (Already defined above as contains_coding_keywords)
+
+
 
 def rerank_task(task_text: str, infinity_url: str) -> list[tuple[str, float]]:
     """Calls the BGE reranker API for a single query string against the 7 tool group definitions."""
@@ -221,6 +248,10 @@ def route_tools_for_query(query: str, threshold: float = 0.0001) -> tuple[list[A
     tasks = decompose_query_to_tasks(query)
 
     selected_groups = set()
+    # Fast‑path: include coding tools if query contains coding keywords
+    if contains_coding_keywords(query):
+        selected_groups.add("coding")
+        logger.info("🔧 [capability_router] Coding keywords detected – exposing coding tools.")
 
     if len(tasks) <= 1:
         # PATH A: Single Group Direct Reranking

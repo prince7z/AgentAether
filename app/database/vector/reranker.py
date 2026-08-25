@@ -88,7 +88,7 @@ async def rerank_chunks(
             "top_n": top_k
         }
         MAX_RETRIES = 2
-            async with httpx.AsyncClient(timeout=5.0) as client:
+        async with httpx.AsyncClient(timeout=5.0) as client:
                 for attempt in range(1, MAX_RETRIES + 1):
                     try:
                         res = await client.post(url, json=payload)
