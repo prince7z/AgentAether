@@ -1,0 +1,52 @@
+sequenceDiagram
+    autonumber
+    actor User as User (Telegram / REST API)
+    participant Gateway as Gateway Layer (handler.py / router.py)
+    participant ConvMgr as ConversationManager (manager.py)
+    participant SQLite as SQLite DB (openclaw.db)
+    participant Graph as LangGraph StateGraph (graph.py)
+    participant Planner as Planner Node (planner.py)
+    participant CapRouter as Capability Router (router.py)
+    participant Infinity as Infinity BGE Reranker API
+    participant LLM as LLM Engine (OpenRouter / Nemotron)
+    participant ToolsNode as Tool Execution Node (graph.py)
+    participant ToolImpl as 28 Tools / Sandboxes / Qdrant
+
+    User->>Gateway: Send Query Prompt
+    Gateway->>ConvMgr: append_user_message(chat_id, HumanMessage)
+    ConvMgr->>SQLite: get_active(chat_id) / load state
+    SQLite-->>ConvMgr: Active State JSON
+    ConvMgr-->>Gateway: Updated State with User Message
+    
+    Gateway->>Graph: astream(state, config)
+    Graph->>Planner: Execute planner(state)
+    
+    rect rgb(240, 248, 255)
+        note over Planner, Infinity: Step 1: Pre-LLM Tool Group Selection & Binding
+        Planner->>Planner: Extract user_query from last HumanMessage
+        Planner->>CapRouter: route_tools_for_query(user_query)
+        CapRouter->>CapRouter: Task Decomposition (split on verbs/conjunctions)
+        CapRouter->>Infinity: Rerank tasks against 7 Tool Group Documents
+        Infinity-->>CapRouter: Relevance Scores per Tool Group
+        CapRouter-->>Planner: Selected Tool Subset (routed_tools)
+        Planner->>Planner: active_llm = llm.bind_tools(routed_tools)
+    end
+
+    rect rgb(255, 250, 240)
+        note over Planner, LLM: Step 2: LLM Call & Tool Selection
+        Planner->>LLM: active_llm.invoke(processed_messages)
+        LLM-->>Planner: AIMessage (with tool_calls OR final text)
+    end
+
+    alt Has tool_calls
+        Graph->>ToolsNode: Route via should_continue -> "tools"
+        ToolsNode->>ToolImpl: Execute requested tools (Sandbox / DB / Browser / Web)
+        ToolImpl-->>ToolsNode: Tool Execution Outputs
+        ToolsNode-->>Planner: ToolMessage results added to state -> Loop back to Planner
+    else No tool_calls (Final Text Response)
+        Graph-->>Gateway: Return final_response
+    end
+
+    Gateway->>ConvMgr: save(chat_id, state)
+    ConvMgr->>SQLite: update_active(chat_id, state_json)
+    Gateway-->>User: Format HTML response / Send message

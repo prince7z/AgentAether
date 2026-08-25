@@ -1,0 +1,101 @@
+graph TD
+    subgraph Client_Interfaces["User / Client Interfaces"]
+        TG["Telegram Client (User Chat)"]
+        API_Client["HTTP / REST API Client"]
+    end
+
+    subgraph Entry_Gateway["Gateway Layer (FastAPI & Gateway Services)"]
+        FastAPI["FastAPI Web Server (app/main.py)"]
+        TG_Gate["Telegram Gateway (app/gateway/telegram)"]
+        Router_API["API Router (app/api/router.py)"]
+    end
+
+    subgraph Memory_Context["State & Conversation Manager"]
+        Conv_Mgr["ConversationManager (app/conversation/manager.py)"]
+        SQLite_DB[("SQLite Database\n(openclaw.db)\nActive Sessions & Archives")]
+    end
+
+    subgraph Agent_Core["Agent Orchestration Core (LangGraph)"]
+        StateGraph["LangGraph StateGraph Workflow"]
+        PlannerNode["Planner Node (app/agent/planner.py)"]
+        ToolsNode["Tool Execution Node (app/agent/graph.py)"]
+        LLM["LLM Engine via OpenRouter\n(ChatOpenAI / Nemotron)"]
+    end
+
+    subgraph Router_Tier["Two-Tier Capability Tool Router"]
+        CapRouter["Capability Router (app/agent/router.py)"]
+        TaskDecomp["Task Decomposition Engine"]
+        InfinityRerank["Infinity Server\n(BAAI/bge-reranker-base)"]
+    end
+
+    subgraph Tool_Capabilities["28 Tool Capabilities (7 Tool Groups)"]
+        subgraph Group_Coding["Coding Tools"]
+            FS_Tools["Filesystem (read, write, list, search, manage)"]
+        end
+        subgraph Group_Sandbox["Sandbox Execution Tools"]
+            Exec_Tools["Execute (bash, python, node)"]
+            Server_Tools["Sandbox Server (start, stop, preview)"]
+        end
+        subgraph Group_Memory["Memory Tools"]
+            Mem_Tool["retrieve_memory"]
+        end
+        subgraph Group_Web["Web Search Tools"]
+            Web_Tool["web_search (Tavily API)"]
+        end
+        subgraph Group_Browser["Browser Automation"]
+            Playwright_Tools["Playwright Headless Browser (open, interact, navigate)"]
+        end
+        subgraph Group_Google["Google Integrations"]
+            Gmail_Tools["Gmail (search, read, send, reply, download)"]
+            Cal_Tools["Google Calendar & Tasks (list, manage, freebusy)"]
+        end
+    end
+
+    subgraph Runtime_Sandbox["Docker Container Sandbox Runtime"]
+        RunMgr["RuntimeManager (app/runtime/manager.py)"]
+        DockerEngine["Docker Daemon"]
+        Containers["Session Containers\n(openclaw-session-<chat_id>)"]
+        ProcMgr["Process Manager & Port Readiness"]
+        NgrokTunnel["Ngrok Preview Manager"]
+    end
+
+    subgraph Vector_Memory["Vector Database & Memory Store"]
+        Qdrant_Client["Qdrant Client"]
+        Qdrant_DB[("Qdrant Vector DB\ncollections: semantic_memory, episodic_memory")]
+    end
+
+    TG --> TG_Gate
+    API_Client --> Router_API
+    TG_Gate --> Conv_Mgr
+    Router_API --> Conv_Mgr
+    Conv_Mgr <--> SQLite_DB
+
+    TG_Gate --> StateGraph
+    Router_API --> StateGraph
+    StateGraph --> PlannerNode
+
+    PlannerNode --> CapRouter
+    CapRouter --> TaskDecomp
+    TaskDecomp --> InfinityRerank
+    CapRouter -- "Selected Tool Group Bindings" --> LLM
+    PlannerNode --> LLM
+    LLM -- "Tool Call Decision" --> ToolsNode
+
+    ToolsNode --> Group_Coding
+    ToolsNode --> Group_Sandbox
+    ToolsNode --> Group_Memory
+    ToolsNode --> Group_Web
+    ToolsNode --> Group_Browser
+    ToolsNode --> Group_Google
+
+    Group_Sandbox --> RunMgr
+    RunMgr --> DockerEngine
+    DockerEngine --> Containers
+    Containers --> ProcMgr
+    ProcMgr --> NgrokTunnel
+
+    Mem_Tool --> Conv_Mgr
+    Conv_Mgr <--> Qdrant_Client
+    Qdrant_Client <--> Qdrant_DB
+
+    TG_Gate -- "Dangerous Action HITL Approvals" <--> Playwright_Tools

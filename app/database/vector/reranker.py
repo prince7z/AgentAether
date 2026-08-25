@@ -87,16 +87,22 @@ async def rerank_chunks(
             "documents": document_texts,
             "top_n": top_k
         }
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            try:
-                res = await client.post(url, json=payload)
-                if res.status_code == 200:
-                    response = res
-                else:
-                    last_error = f"status {res.status_code}: {res.text}"
-            except Exception as exc:
-                last_error = str(exc)
-                logger.warning(f"Reranker failed on endpoint {url}: {exc}")
+        MAX_RETRIES = 2
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                for attempt in range(1, MAX_RETRIES + 1):
+                    try:
+                        res = await client.post(url, json=payload)
+                        if res.status_code == 200:
+                            response = res
+                            break
+                        else:
+                            last_error = f"status {res.status_code}: {res.text}"
+                            logger.warning(f"Reranker attempt {attempt} failed with status {res.status_code}: {res.text}")
+                    except Exception as exc:
+                        last_error = str(exc)
+                        logger.warning(f"Reranker attempt {attempt} failed on endpoint {url}: {exc}")
+                    if attempt < MAX_RETRIES:
+                        await asyncio.sleep(0.5)  # brief pause before retry
 
     if not response or response.status_code != 200:
         log_stage(
