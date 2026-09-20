@@ -14,6 +14,7 @@ from app.tools import (
     manage_file,
     list_files,
     search_files,
+    send_file,
     execute_python_code,
     execute_node_code,
     execute_bash_command,
@@ -54,6 +55,7 @@ TOOL_GROUP_MAP = {
         manage_file,
         list_files,
         search_files,
+        send_file,
         execute_python_code,
         execute_node_code,
         execute_bash_command,
@@ -92,7 +94,7 @@ TOOL_GROUP_DOCUMENTS = {
     "memory": "Memory tools: Retrieve relevant information from previous conversations, persistent user facts, preferences, project decisions, historical discussions, and past debugging sessions. and user information",
     "web": "Web tools: Search the internet for fresh or current information, websites, news, documentation, prices, external facts, and online resources.",
     "calendar": "Calendar tools: List calendars, events, meetings, tasks, and check availability or free/busy periods. Create, update, or delete calendar events and tasks.",
-    "coding": "Coding tools: Read, search, create, modify, and execute code and files inside the workspace. Use for programming, debugging, testing, compilation, and development tasks.",
+    "coding": "Coding and filesystem export tools: Read, search, create, modify, send_file, compress, zip, attach, send, export, and execute code and files inside the workspace. Use for programming, debugging, testing, sending codebase/folder as zip/files, sharing files, compilation, and development tasks.",
     "browser": "Browser tools: Open websites, navigate pages, interact with page elements, click, type, select, scroll, and upload or download files through a browser.",
     "sandbox": "Sandbox tools: Start, stop, and inspect long-running development servers and obtain preview URLs for applications running in the sandbox.",
 }
@@ -113,20 +115,30 @@ CODING_KEYWORDS = [
     "install",
     "deploy",
     "package",
+    "send",
+    "attach",
+    "zip",
+    "export",
+    "share",
+    "portfolio",
+    "workspace",
+    "file",
+    "files",
 ]
 
 def contains_coding_keywords(query: str) -> bool:
     """Return True if the query contains any coding‑related keyword.
     Uses a simple word‑boundary regex for detection, case‑insensitive.
     """
-    pattern = re.compile(r"\\b(" + "|".join(CODING_KEYWORDS) + r")\\b", re.IGNORECASE)
+    pattern = re.compile(r"\b(" + "|".join(CODING_KEYWORDS) + r")\b", re.IGNORECASE)
     return bool(pattern.search(query))
 DOCUMENTS_LIST = [TOOL_GROUP_DOCUMENTS[name] for name in TOOL_GROUP_NAMES]
 
 COMMON_VERBS = [
     "make", "create", "build", "find", "search", "start", "stop", "open",
     "check", "send", "reply", "email", "get", "list", "run", "read", "write",
-    "update", "delete", "format", "inspect", "navigate", "download", "save", "look"
+    "update", "delete", "format", "inspect", "navigate", "download", "save", "look",
+    "attach", "zip", "export", "share"
 ]
 
 CONVERSATIONAL_PATTERNS = [
@@ -241,7 +253,7 @@ def route_tools_for_query(query: str, threshold: float = 0.0001) -> tuple[list[A
 
     # Fast-path check for purely conversational queries (hello, tell me a joke, thanks, etc.)
     if is_conversational_query(query):
-        logger.info("💬 [capability_router] Conversational chit-chat query detected. Exposing 0 tools (Pure LLM response).")
+        logger.info("[capability_router] Conversational chit-chat query detected. Exposing 0 tools (Pure LLM response).")
         return [], []
 
     infinity_url = settings.infinity_url or "http://72.62.247.193:7997"
@@ -251,11 +263,11 @@ def route_tools_for_query(query: str, threshold: float = 0.0001) -> tuple[list[A
     # Fast‑path: include coding tools if query contains coding keywords
     if contains_coding_keywords(query):
         selected_groups.add("coding")
-        logger.info("🔧 [capability_router] Coding keywords detected – exposing coding tools.")
+        logger.info("[capability_router] Coding keywords detected - exposing coding tools.")
 
     if len(tasks) <= 1:
         # PATH A: Single Group Direct Reranking
-        logger.info("⚡ [capability_router] Single-action query detected. Direct reranking...")
+        logger.info("[capability_router] Single-action query detected. Direct reranking...")
         results = rerank_task(query, infinity_url)
         if results:
             top_group, top_score = results[0]
@@ -265,7 +277,7 @@ def route_tools_for_query(query: str, threshold: float = 0.0001) -> tuple[list[A
                     selected_groups.add(results[1][0])
     else:
         # PATH B: Multi-Action Query -> Decompose into T1, T2, T3 -> Rerank per task
-        logger.info(f"🔀 [capability_router] Multi-action query detected ({len(tasks)} tasks: {tasks}). Task-by-task reranking...")
+        logger.info(f"[capability_router] Multi-action query detected ({len(tasks)} tasks: {tasks}). Task-by-task reranking...")
         for task in tasks:
             results = rerank_task(task, infinity_url)
             if results:
@@ -277,7 +289,7 @@ def route_tools_for_query(query: str, threshold: float = 0.0001) -> tuple[list[A
 
     # Fallback to all tools if empty selection or error on action query
     if not selected_groups:
-        logger.info("⚠️ [capability_router] No specific tool group selected or reranker unavailable. Exposing default full tool set.")
+        logger.info("[capability_router] No specific tool group selected or reranker unavailable. Exposing default full tool set.")
         return all_tools, list(TOOL_GROUP_MAP.keys())
 
     selected_tools = []
@@ -285,7 +297,7 @@ def route_tools_for_query(query: str, threshold: float = 0.0001) -> tuple[list[A
         selected_tools.extend(TOOL_GROUP_MAP.get(group_name, []))
 
     logger.info(
-        f"🎯 [capability_router] Selected Groups: {sorted(list(selected_groups))} "
+        f"[capability_router] Selected Groups: {sorted(list(selected_groups))} "
         f"(Exposing {len(selected_tools)}/{len(all_tools)} tools to bind_tools)"
     )
 

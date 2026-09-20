@@ -381,6 +381,24 @@ class TelegramMessageHandler:
 							"Failed to send message chunk: %s", send_err
 						)
 
+			# Process file attachments tagged with [ATTACH_FILE:<path>]
+			import re
+			from pathlib import Path
+			raw_check_text = (final_response or "") + str(executed_tools)
+			attachment_matches = re.findall(r"\[ATTACH_FILE:(.*?)\]", raw_check_text)
+			for attach_path in set(attachment_matches):
+				try:
+					p = Path(attach_path.strip())
+					if p.exists() and p.is_file():
+						with open(p, "rb") as doc:
+							await message.reply_document(
+								document=doc,
+								filename=p.name,
+								caption=f"📎 Attached: {p.name}",
+							)
+				except Exception as att_err:
+					logger.error("Failed to send document attachment %s: %s", attach_path, att_err)
+
 			await conv_manager.save(update.effective_chat.id, state)
 
 		except Exception as exc:

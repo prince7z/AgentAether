@@ -6,6 +6,7 @@ from app.tools.filesystem import (
     manage_file,
     list_files,
     search_files,
+    send_file,
 )
 from app.tools.search import web_search
 from app.tools.gmail import (
@@ -70,7 +71,7 @@ tools = [
     manage_file,
     list_files,
     search_files,
-
+    send_file,
 ]
 
 
