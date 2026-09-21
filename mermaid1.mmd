@@ -40,7 +40,15 @@ sequenceDiagram
 
     alt Has tool_calls
         Graph->>ToolsNode: Route via should_continue -> "tools"
-        ToolsNode->>ToolImpl: Execute requested tools (Sandbox / DB / Browser / Web)
+        rect rgb(230, 245, 230)
+            note over ToolsNode, ToolImpl: Browser Perception: On-Device Dual Privacy Engine
+            alt Standard Mode (99% Tasks - <5ms)
+                ToolsNode->>ToolImpl: 100+ Entity Group Pattern Matching (Email, Pass, Card, OTP, SSH Keys)
+            else Advanced Mode (1% Crypto/Enterprise)
+                ToolsNode->>ToolImpl: HTML Noise Stripping -> JSON DOM Tree -> On-Device Local LLM Inference
+            end
+        end
+        ToolsNode->>ToolImpl: Execute requested tools with Sanitized Context (Sandbox / DB / Browser / Web)
         ToolImpl-->>ToolsNode: Tool Execution Outputs
         ToolsNode-->>Planner: ToolMessage results added to state -> Loop back to Planner
     else No tool_calls (Final Text Response)

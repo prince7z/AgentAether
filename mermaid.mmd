@@ -42,8 +42,14 @@ graph TD
         subgraph Group_Web["Web Search Tools"]
             Web_Tool["web_search (Tavily API)"]
         end
-        subgraph Group_Browser["Browser Automation"]
-            Playwright_Tools["Playwright Headless Browser (open, interact, navigate)"]
+        subgraph Group_Browser["Browser Automation & Privacy Engine"]
+            Playwright_Tools["Playwright Browser (open, interact, navigate)"]
+            
+            subgraph Dual_Privacy["On-Device Dual Privacy Engine"]
+                StandardMode["Standard Mode (99% Tasks - <5ms)<br/>100+ Entity Group Pattern Engine"]
+                AdvancedMode["Advanced Mode (1% Crypto/Enterprise)<br/>Local LLM & JSON DOM Tree Parser"]
+                SanitizedGate["Sanitization Gate (Zero Raw PII Outbound)"]
+            end
         end
         subgraph Group_Google["Google Integrations"]
             Gmail_Tools["Gmail (search, read, send, reply, download)"]

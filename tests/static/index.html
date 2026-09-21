@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Government of India — Citizen Registration Portal (USER INPUT SCREEN)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Tricolor Bar -->
+  <div class="tricolor-strip"></div>
+
+  <!-- Official Header -->
+  <header class="gov-header">
+    <div class="gov-emblem-box">
+      <svg class="gov-emblem" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" stroke="#D4AF37" stroke-width="4" fill="#002B49"/>
+        <text x="50" y="42" font-family="serif" font-size="22" font-weight="bold" fill="#FF9933" text-anchor="middle">सत्यमेव</text>
+        <text x="50" y="65" font-family="serif" font-size="22" font-weight="bold" fill="#138808" text-anchor="middle">जयते</text>
+      </svg>
+      <div class="gov-title-text">
+        <h1>भारत सरकार | GOVERNMENT OF INDIA</h1>
+        <h2>राष्ट्रीय नागरिक सेवा एवं ऑनलाइन पंजीकरण पोर्टल (CITIZEN REGISTRATION PORTAL)</h2>
+      </div>
+    </div>
+    <div class="gov-badge">BROWSER 1: USER INPUT</div>
+  </header>
+
+  <!-- Official Notice -->
+  <div class="gov-banner">
+    <div><strong>Notice:</strong> Please complete your citizen verification details. All sensitive credentials are protected on-device by the AgentO₃ Privacy Engine.</div>
+  </div>
+
+  <div class="container">
+    <div class="portal-card">
+      <div class="portal-title-bar">
+        <span>FORM 7-B: CITIZEN IDENTITY & SERVICE APPLICATION</span>
+        <span style="font-size:12px; font-weight:normal;">Ref ID: GOI-2026-883921</span>
+      <div class="portal-card-content">
+        <form id="citizenForm" onsubmit="return false;">
+        
+        <!-- Fieldset 1: Basic Identity -->
+        <fieldset class="gov-fieldset">
+          <legend class="gov-legend">Section 1: General Information (Non-Sensitive)</legend>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="gov-label" for="fullname">Full Name <span class="required">*</span></label>
+              <input type="text" id="fullname" name="fullname" class="gov-input" placeholder="e.g. Rajesh Kumar">
+            </div>
+
+            <div class="form-group">
+              <label class="gov-label" for="age">Age <span class="required">*</span></label>
+              <input type="number" id="age" name="age" class="gov-input" placeholder="e.g. 29">
+            </div>
+
+            <div class="form-group">
+              <label class="gov-label" for="gender">Gender <span class="required">*</span></label>
+              <select id="gender" name="gender" class="gov-input">
+                <option value="" selected disabled>-- Select Gender --</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="gov-label" for="dob">Date of Birth</label>
+              <input type="date" id="dob" name="dob" class="gov-input">
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Fieldset 2: Sensitive Credentials -->
+        <fieldset class="gov-fieldset">
+          <legend class="gov-legend">Section 2: Contact & Account Credentials (PII Sensitive)</legend>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="gov-label" for="phone">Mobile Phone Number <span class="required">*</span></label>
+              <input type="tel" id="phone" name="phone" class="gov-input" placeholder="e.g. +91 9876543210">
+            </div>
+
+            <div class="form-group">
+              <label class="gov-label" for="email">Email Address <span class="required">*</span></label>
+              <input type="email" id="email" name="email" class="gov-input" placeholder="e.g. rajesh.kumar@gov.in">
+            </div>
+
+            <div class="form-group full-width">
+              <label class="gov-label" for="password">Account Security Password <span class="required">*</span></label>
+              <input type="password" id="password" name="password" class="gov-input" placeholder="Enter secure password">
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Fieldset 3: Financial & Payment Info -->
+        <fieldset class="gov-fieldset">
+          <legend class="gov-legend">Section 3: Verification Payment Details (Confidential)</legend>
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="gov-label" for="card">Credit / Debit Card Number <span class="required">*</span></label>
+              <input type="text" id="card" name="card" class="gov-input" placeholder="4532 8912 3456 7890">
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Fieldset 4: Photo Identity Upload -->
+        <fieldset class="gov-fieldset">
+          <legend class="gov-legend">Section 4: Identity Verification Photo (Biometric Data)</legend>
+          <div class="drop-zone" id="dropZone">
+            <div class="drop-zone-text">📸 Drag & Drop Passport Photo here, or click to upload</div>
+            <button type="button" class="btn-gov-secondary" onclick="document.getElementById('fileInput').click()">Browse Image File</button>
+            <button type="button" class="btn-gov-secondary" id="samplePhotoBtn" style="margin-left: 8px; background:#D4AF37; color:#000;">Use Sample Face Photo</button>
+            <input type="file" id="fileInput" class="file-input-hidden" accept="image/*">
+          </div>
+
+          <div class="preview-container" id="previewWrapper">
+            <img id="imagePreview" class="image-preview" src="" alt="Live Upload Preview" style="display:none;">
+          </div>
+        </fieldset>
+
+        <!-- Action Buttons -->
+        <div class="gov-btn-group">
+          <button type="button" class="btn-gov-reset" id="resetBtn">Clear Form</button>
+          <button type="button" class="btn-gov-primary" id="submitBtn">Submit Official Form</button>
+        </div>
+
+      </form>
+      </div>
+    </div>
+
+    <!-- Official Footer -->
+    <footer class="gov-footer">
+      Designed & Developed for AgentO₃ Privacy Perception Demo — Smart India Hackathon 2026 (Team The Alchemists)<br>
+      © 2026 National Single Window Portal. All rights reserved.
+    </footer>
+  </div>
+
+  <script src="user.js"></script>
+</body>
+</html>

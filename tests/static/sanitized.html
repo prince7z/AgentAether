@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Government of India — Citizen Registration Portal (AGENT PERCEPTION VIEW)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Tricolor Bar -->
+  <div class="tricolor-strip"></div>
+
+  <!-- Official Header -->
+  <header class="gov-header">
+    <div class="gov-emblem-box">
+      <svg class="gov-emblem" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" stroke="#D4AF37" stroke-width="4" fill="#002B49"/>
+        <text x="50" y="42" font-family="serif" font-size="22" font-weight="bold" fill="#FF9933" text-anchor="middle">सत्यमेव</text>
+        <text x="50" y="65" font-family="serif" font-size="22" font-weight="bold" fill="#138808" text-anchor="middle">जयते</text>
+      </svg>
+      <div class="gov-title-text">
+        <h1>भारत सरकार | GOVERNMENT OF INDIA</h1>
+        <h2>राष्ट्रीय नागरिक सेवा एवं ऑनलाइन पंजीकरण पोर्टल (CITIZEN REGISTRATION PORTAL)</h2>
+      </div>
+    </div>
+    <div class="gov-badge" id="agentBadge" style="border-color:#10B981; color:#10B981;">
+      <span style="display:inline-block; width:8px; height:8px; background:#10B981; border-radius:50%; margin-right:4px;"></span>
+      BROWSER 2: AGENT PERCEPTION VIEW
+    </div>
+  </header>
+
+  <!-- Official Notice -->
+  <div class="gov-banner" id="agentBanner">
+    <div><strong>Agent Perception Stream:</strong> Waiting for user actions. Sensitive credentials will be masked on-device in real-time before outbound transmission.</div>
+  </div>
+
+  <div class="container">
+    <div class="portal-card">
+      <div class="portal-title-bar">
+        <span>FORM 7-B: CITIZEN IDENTITY & SERVICE APPLICATION</span>
+        <span style="font-size:12px; font-weight:normal;">Ref ID: GOI-2026-883921</span>
+      <div class="portal-card-content">
+        <form id="sanitizedForm" onsubmit="return false;">
+        
+        <!-- Fieldset 1: Basic Identity -->
+        <fieldset class="gov-fieldset">
+          <legend class="gov-legend">Section 1: General Information (Non-Sensitive)</legend>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="gov-label" for="ag_fullname">Full Name <span class="required">*</span></label>
+              <input type="text" id="ag_fullname" class="gov-input" readonly placeholder="e.g. Rajesh Kumar">
+            </div>
+
+            <div class="form-group">
+              <label class="gov-label" for="ag_age">Age <span class="required">*</span></label>
+              <input type="text" id="ag_age" class="gov-input" readonly placeholder="e.g. 29">
+            </div>
+
+            <div class="form-group">
+              <label class="gov-label" for="ag_gender">Gender <span class="required">*</span></label>
+              <input type="text" id="ag_gender" class="gov-input" readonly placeholder="-- Select Gender --">
+            </div>
+
+            <div class="form-group">
+              <label class="gov-label" for="ag_dob">Date of Birth</label>
+              <input type="text" id="ag_dob" class="gov-input" readonly placeholder="dd-mm-yyyy">
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Fieldset 2: Sensitive Credentials -->
+        <fieldset class="gov-fieldset" id="fieldset_sec2">
+          <legend class="gov-legend" id="legend_sec2">Section 2: Contact & Account Credentials (PII Sensitive)</legend>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="gov-label" for="ag_phone">Mobile Phone Number <span class="required">*</span></label>
+              <input type="text" id="ag_phone" class="gov-input" readonly placeholder="e.g. +91 9876543210">
+            </div>
+
+            <div class="form-group">
+              <label class="gov-label" for="ag_email">Email Address <span class="required">*</span></label>
+              <input type="text" id="ag_email" class="gov-input" readonly placeholder="e.g. rajesh.kumar@gov.in">
+            </div>
+
+            <div class="form-group full-width">
+              <label class="gov-label" for="ag_password">Account Security Password <span class="required">*</span></label>
+              <input type="text" id="ag_password" class="gov-input" readonly placeholder="Enter secure password">
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Fieldset 3: Financial & Payment Info -->
+        <fieldset class="gov-fieldset" id="fieldset_sec3">
+          <legend class="gov-legend" id="legend_sec3">Section 3: Verification Payment Details (Confidential)</legend>
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="gov-label" for="ag_card">Credit / Debit Card Number <span class="required">*</span></label>
+              <input type="text" id="ag_card" class="gov-input" readonly placeholder="4532 8912 3456 7890">
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Fieldset 4: Photo Identity Upload -->
+        <fieldset class="gov-fieldset" id="fieldset_sec4">
+          <legend class="gov-legend" id="legend_sec4">Section 4: Identity Verification Photo (Biometric Data)</legend>
+          <div class="drop-zone" id="ag_dropZone">
+            <div class="drop-zone-text" id="ag_dropText">📸 Drag & Drop Passport Photo here, or click to upload</div>
+          </div>
+
+          <div class="preview-container">
+            <div class="blurred-image-container" id="canvasWrapper" style="display:none; margin-top:10px;">
+              <canvas id="blurredCanvas" class="blurred-canvas" width="140" height="160"></canvas>
+              <div class="blur-overlay-badge">🔒 &lt;BLURRED IMAGE&gt;</div>
+            </div>
+          </div>
+        </fieldset>
+
+      </form>
+
+      <!-- Terminal Output showing Context JSON passed to LLM -->
+      <div class="agent-terminal" style="margin-top: 20px;">
+        <div class="terminal-header">
+          <span>OUTBOUND VLM CONTEXT STREAM (LANGGRAPH PAYLOAD)</span>
+          <span style="color:var(--agent-green)">PRIVACY SECURED</span>
+        </div>
+        <pre id="jsonPayload">{
+  "task": "Citizen Verification Form Submission",
+  "sanitized_dom": {
+    "fullname": "",
+    "age": "",
+    "gender": "",
+    "dob": "",
+    "phone": "",
+    "email": "",
+    "password": "",
+    "card": ""
+  },
+  "visual_perception": {
+    "face_count_detected": 0,
+    "privacy_mask_applied": false,
+    "image_token": "NULL"
+  },
+  "raw_pii_exfiltrated": 0
+}</pre>
+      </div>
+      </div>
+    </div>
+
+    <!-- Official Footer -->
+    <footer class="gov-footer">
+      Designed & Developed for AgentO₃ Privacy Perception Demo — Smart India Hackathon 2026 (Team The Alchemists)<br>
+      © 2026 National Single Window Portal. All rights reserved.
+    </footer>
+  </div>
+
+  <script src="agent.js"></script>
+</body>
+</html>
