@@ -23,6 +23,7 @@ Operating locally inside a lightweight browser extension environment, AgentO₃ 
 The cloud VLM receives **strictly sanitized context**, plans structured actions, and returns commands that are verified by a **Local Control Gate** prior to browser execution.
 
 ```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '14px', 'fontFamily': 'Segoe UI, Helvetica, Arial, sans-serif' }}}%%
 graph LR
     subgraph CLIENT["ON-DEVICE CLIENT (Local Browser)"]
         UserPrompt["User Prompt"] --> LocalInterface["Local Interface & Context Capture"]
@@ -45,9 +46,9 @@ graph LR
         LocalControlGate --> BrowserExecution["Browser Executor<br/>(Click / Type / Scroll)"]
     end
 
-    classDef localStyle fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
-    classDef cloudStyle fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
-    classDef execStyle fill:#fff3e0,stroke:#ef6c00,stroke-width:2px;
+    classDef localStyle fill:#F0FDF4,stroke:#16A34A,stroke-width:2px,color:#064E3B;
+    classDef cloudStyle fill:#EFF6FF,stroke:#2563EB,stroke-width:2px,color:#1E3A8A;
+    classDef execStyle fill:#FFFBEB,stroke:#D97706,stroke-width:2px,color:#78350F;
 
     class UserPrompt,LocalInterface,ModeSelector,StandardEngine,AdvancedEngine,PrivacyGate localStyle;
     class CloudVLM,CloudResponse cloudStyle;
@@ -163,6 +164,7 @@ AgentO₃ introduces a **Privacy-First Dual-Layer Architecture** powered by a **
 ### Master Architecture Diagram
 
 ```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '13px', 'fontFamily': 'Segoe UI, Helvetica, Arial, sans-serif' }}}%%
 graph TD
 
     %% =========================================================
@@ -422,17 +424,17 @@ graph TD
 
 
     %% =========================================================
-    %% STYLING
+    %% STYLING (LIGHT THEME PALETTE)
     %% =========================================================
 
-    classDef local fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
-    classDef privacy fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
-    classDef cloud fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
-    classDef execution fill:#fce4ec,stroke:#ad1457,stroke-width:2px
-    classDef memory fill:#ede7f6,stroke:#5e35b1,stroke-width:2px
+    classDef local fill:#F0FDF4,stroke:#16A34A,stroke-width:2px,color:#064E3B
+    classDef privacy fill:#FFFBEB,stroke:#D97706,stroke-width:2px,color:#78350F
+    classDef cloud fill:#EFF6FF,stroke:#2563EB,stroke-width:2px,color:#1E3A8A
+    classDef execution fill:#FDF2F8,stroke:#DB2777,stroke-width:2px,color:#831843
+    classDef memory fill:#F5F3FF,stroke:#7C3AED,stroke-width:2px,color:#4C1D95
 
     class Browser,DOM,Screenshot,BrowserActions,Extension local
-    class PIIDetector,SensitiveDetector,Redactor,SanitizedDOM,SanitizedImage,SceneGraph,LocalLLM,LocalVision privacy
+    class PIIDetector,SensitiveDetector,Redactor,SanitizedDOM,SanitizedImage,SceneGraph,LocalLLM,LocalVision,ModeRouter,RegexEngine,FastNER,HTMLCleaner,DOMTreeBuilder,LocalLLMInference privacy
     class CloudLLM,StateGraph,Planner,CapabilityRouter,ToolSelector,APIGateway cloud
     class BrowserExecutor,WebTools,FileTools,SystemTools,CommandValidator,PolicyEngine execution
     class SQLite,Qdrant,ConversationManager,VectorMemory memory
@@ -443,6 +445,7 @@ graph TD
 ### Implementation Process Flow Diagram
 
 ```mermaid
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '13px', 'fontFamily': 'Segoe UI, Helvetica, Arial, sans-serif' }}}%%
 sequenceDiagram
     autonumber
     actor User as User
