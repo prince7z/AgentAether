@@ -1,107 +1,131 @@
+%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '13px', 'fontFamily': 'Segoe UI, Helvetica, Arial, sans-serif' }}}%%
 graph TD
-    subgraph Client_Interfaces["User / Client Interfaces"]
-        TG["Telegram Client (User Chat)"]
-        API_Client["HTTP / REST API Client"]
+
+    %% =========================================================
+    %% 1. USER & EXTENSION CLIENT LAYER
+    %% =========================================================
+
+    subgraph CLIENT["USER / CLIENT INTERFACE LAYER"]
+        User["User"] --> ExtUI["Browser Extension UI<br/>(React / TypeScript)"]
+        ExtUI --> TaskQueue["Task Queue & Session Manager"]
     end
 
-    subgraph Entry_Gateway["Gateway Layer (FastAPI & Gateway Services)"]
-        FastAPI["FastAPI Web Server (app/main.py)"]
-        TG_Gate["Telegram Gateway (app/gateway/telegram)"]
-        Router_API["API Router (app/api/router.py)"]
-    end
 
-    subgraph Memory_Context["State & Conversation Manager"]
-        Conv_Mgr["ConversationManager (app/conversation/manager.py)"]
-        SQLite_DB[("SQLite Database\n(openclaw.db)\nActive Sessions & Archives")]
-    end
+    %% =========================================================
+    %% 2. LOCAL ENVIRONMENT (PRIVACY, CONTROL & MEMORY)
+    %% =========================================================
 
-    subgraph Agent_Core["Agent Orchestration Core (LangGraph)"]
-        StateGraph["LangGraph StateGraph Workflow"]
-        PlannerNode["Planner Node (app/agent/planner.py)"]
-        ToolsNode["Tool Execution Node (app/agent/graph.py)"]
-        LLM["LLM Engine via OpenRouter\n(ChatOpenAI / Nemotron)"]
-    end
+    subgraph LOCAL["LOCAL ON-DEVICE ENVIRONMENT — Perception, Privacy & Control Gate"]
 
-    subgraph Router_Tier["Two-Tier Capability Tool Router"]
-        CapRouter["Capability Router (app/agent/router.py)"]
-        TaskDecomp["Task Decomposition Engine"]
-        InfinityRerank["Infinity Server\n(BAAI/bge-reranker-base)"]
-    end
-
-    subgraph Tool_Capabilities["28 Tool Capabilities (7 Tool Groups)"]
-        subgraph Group_Coding["Coding Tools"]
-            FS_Tools["Filesystem (read, write, list, search, manage)"]
+        subgraph BROWSER_OBSERVE["Local Browser Observer"]
+            UserBrowser["User Browser (Chromium / CDP)"]
+            DOMTree["Raw DOM Tree & A11y Tree"]
+            ViewportImg["Raw Viewport Screenshot"]
+            ContextCapture["Context Capture Processor"]
         end
-        subgraph Group_Sandbox["Sandbox Execution Tools"]
-            Exec_Tools["Execute (bash, python, node)"]
-            Server_Tools["Sandbox Server (start, stop, preview)"]
-        end
-        subgraph Group_Memory["Memory Tools"]
-            Mem_Tool["retrieve_memory"]
-        end
-        subgraph Group_Web["Web Search Tools"]
-            Web_Tool["web_search (Tavily API)"]
-        end
-        subgraph Group_Browser["Browser Automation & Privacy Engine"]
-            Playwright_Tools["Playwright Browser (open, interact, navigate)"]
-            
-            subgraph Dual_Privacy["On-Device Dual Privacy Engine"]
-                StandardMode["Standard Mode (99% Tasks - <5ms)<br/>100+ Entity Group Pattern Engine"]
-                AdvancedMode["Advanced Mode (1% Crypto/Enterprise)<br/>Local LLM & JSON DOM Tree Parser"]
-                SanitizedGate["Sanitization Gate (Zero Raw PII Outbound)"]
+
+        subgraph DUAL_PRIVACY["Innovative Dual-Engine Privacy Gate"]
+            DOMParser["DOM & Screenshot Extractor"]
+            ModeRouter{"Privacy Mode Router"}
+
+            subgraph STANDARD_MODE["Standard Mode (99% Tasks — <5ms Overhead)"]
+                RegexEngine["100+ Entity Group Pattern Engine<br/>(Email, Password, Card, OTP, SSH Keys)"]
+                FastNER["Fast Local NER & Vision Masker<br/>(ONNX Runtime Web / WASM)"]
             end
+
+            subgraph ADVANCED_MODE["Advanced Mode (1% Crypto/Enterprise Workflows)"]
+                HTMLCleaner["HTML Script & Style Noise Stripper"]
+                DOMTreeBuilder["JSON DOM Tree Builder"]
+                LocalLLMInference["On-Device Local LLM Inference<br/>(WASM / WebGPU)"]
+            end
+
+            Redactor["Sanitization & Redaction Engine"]
+            SanitizedScene["Sanitized Scene Graph & DOM Tree"]
+            PrivacyGate["Privacy Gate<br/>(Zero Raw PII Outbound)"]
         end
-        subgraph Group_Google["Google Integrations"]
-            Gmail_Tools["Gmail (search, read, send, reply, download)"]
-            Cal_Tools["Google Calendar & Tasks (list, manage, freebusy)"]
+
+        subgraph LOCAL_CONTROLLER["Local Controller & Action Gate"]
+            LocalManager["Local Manager Controller"]
+            PolicyEngine["Security Policy & Allowlist Verifier"]
+            BrowserExecutor["Browser Executor (Click / Type / Scroll)"]
+            HITLGate["Human-in-the-Loop (HITL) Gate"]
         end
+
+        subgraph LOCAL_MEMORY["Local Memory & Storage"]
+            SQLiteDB[("SQLite Database<br/>(Active Sessions & State)")]
+            QdrantDB[("Qdrant Vector DB<br/>(Episodic & Semantic Memory)")]
+        end
+
     end
 
-    subgraph Runtime_Sandbox["Docker Container Sandbox Runtime"]
-        RunMgr["RuntimeManager (app/runtime/manager.py)"]
-        DockerEngine["Docker Daemon"]
-        Containers["Session Containers\n(openclaw-session-<chat_id>)"]
-        ProcMgr["Process Manager & Port Readiness"]
-        NgrokTunnel["Ngrok Preview Manager"]
+
+    %% =========================================================
+    %% 3. CLOUD REASONING BACKEND
+    %% =========================================================
+
+    subgraph CLOUD["CLOUD REASONING BACKEND — Privacy Secured"]
+        APIGateway["API Gateway (FastAPI / REST)"]
+        StateGraph["LangGraph StateGraph Workflow"]
+        TaskPlanner["Task Decomposition & Planner Node"]
+        CloudVLM["Cloud VLM / Reasoning Model<br/>(Qwen2.5-VL / Claude 3.5 Sonnet)"]
+        ActionCommand["Structured Action Command Vector"]
     end
 
-    subgraph Vector_Memory["Vector Database & Memory Store"]
-        Qdrant_Client["Qdrant Client"]
-        Qdrant_DB[("Qdrant Vector DB\ncollections: semantic_memory, episodic_memory")]
-    end
 
-    TG --> TG_Gate
-    API_Client --> Router_API
-    TG_Gate --> Conv_Mgr
-    Router_API --> Conv_Mgr
-    Conv_Mgr <--> SQLite_DB
+    %% =========================================================
+    %% FLOW CONNECTIONS
+    %% =========================================================
 
-    TG_Gate --> StateGraph
-    Router_API --> StateGraph
-    StateGraph --> PlannerNode
+    TaskQueue --> ContextCapture
+    UserBrowser --> DOMTree
+    UserBrowser --> ViewportImg
 
-    PlannerNode --> CapRouter
-    CapRouter --> TaskDecomp
-    TaskDecomp --> InfinityRerank
-    CapRouter -- "Selected Tool Group Bindings" --> LLM
-    PlannerNode --> LLM
-    LLM -- "Tool Call Decision" --> ToolsNode
+    DOMTree --> ContextCapture
+    ViewportImg --> ContextCapture
 
-    ToolsNode --> Group_Coding
-    ToolsNode --> Group_Sandbox
-    ToolsNode --> Group_Memory
-    ToolsNode --> Group_Web
-    ToolsNode --> Group_Browser
-    ToolsNode --> Group_Google
+    ContextCapture --> DOMParser
+    DOMParser --> ModeRouter
 
-    Group_Sandbox --> RunMgr
-    RunMgr --> DockerEngine
-    DockerEngine --> Containers
-    Containers --> ProcMgr
-    ProcMgr --> NgrokTunnel
+    ModeRouter -- "99% Routine Tasks" --> RegexEngine --> FastNER --> Redactor
+    ModeRouter -- "1% Enterprise/Crypto" --> HTMLCleaner --> DOMTreeBuilder --> LocalLLMInference --> Redactor
 
-    Mem_Tool --> Conv_Mgr
-    Conv_Mgr <--> Qdrant_Client
-    Qdrant_Client <--> Qdrant_DB
+    Redactor --> SanitizedScene
+    SanitizedScene --> PrivacyGate
 
-    TG_Gate -- "Dangerous Action HITL Approvals" <--> Playwright_Tools
+    TaskQueue <--> SQLiteDB
+    TaskQueue <--> QdrantDB
+
+    PrivacyGate -- "Sanitized DOM + Blurred Viewport (<EMAIL>, <PASSWD>)" --> APIGateway
+    APIGateway --> StateGraph
+    StateGraph --> TaskPlanner
+    TaskPlanner --> CloudVLM
+    CloudVLM --> ActionCommand
+
+    ActionCommand --> LocalManager
+    LocalManager --> PolicyEngine
+    PolicyEngine -- "Approved Action" --> BrowserExecutor
+    PolicyEngine -- "Sensitive Operation" --> HITLGate
+    HITLGate -- "User Authorizes" --> BrowserExecutor
+
+    BrowserExecutor --> UserBrowser
+
+
+    %% =========================================================
+    %% STYLING (LIGHT THEME PALETTE)
+    %% =========================================================
+
+    classDef clientStyle fill:#F0FDF4,stroke:#16A34A,stroke-width:2px,color:#064E3B;
+    classDef privacyStyle fill:#FFFBEB,stroke:#D97706,stroke-width:2px,color:#78350F;
+    classDef standardStyle fill:#ECFDF5,stroke:#059669,stroke-width:1.5px,color:#064E3B;
+    classDef advancedStyle fill:#FEF2F2,stroke:#DC2626,stroke-width:1.5px,color:#7F1D1D;
+    classDef cloudStyle fill:#EFF6FF,stroke:#2563EB,stroke-width:2px,color:#1E3A8A;
+    classDef execStyle fill:#FAF5FF,stroke:#7C3AED,stroke-width:2px,color:#4C1D95;
+    classDef memoryStyle fill:#F5F3FF,stroke:#8B5CF6,stroke-width:2px,color:#4C1D95;
+
+    class User,ExtUI,TaskQueue clientStyle;
+    class UserBrowser,DOMTree,ViewportImg,ContextCapture,DOMParser,ModeRouter,Redactor,SanitizedScene,PrivacyGate privacyStyle;
+    class RegexEngine,FastNER standardStyle;
+    class HTMLCleaner,DOMTreeBuilder,LocalLLMInference advancedStyle;
+    class APIGateway,StateGraph,TaskPlanner,CloudVLM,ActionCommand cloudStyle;
+    class LocalManager,PolicyEngine,BrowserExecutor,HITLGate execStyle;
+    class SQLiteDB,QdrantDB memoryStyle;

@@ -168,276 +168,133 @@ AgentO₃ introduces a **Privacy-First Dual-Layer Architecture** powered by a **
 graph TD
 
     %% =========================================================
-    %% USER / CLIENT
+    %% 1. USER & EXTENSION CLIENT LAYER
     %% =========================================================
 
-    subgraph CLIENT["USER / CLIENT LAYER"]
-        User["User"]
-        Extension["Browser Extension UI<br/>TypeScript"]
+    subgraph CLIENT["USER / CLIENT INTERFACE LAYER"]
+        User["User"] --> ExtUI["Browser Extension UI<br/>(React / TypeScript)"]
+        ExtUI --> TaskQueue["Task Queue & Session Manager"]
     end
 
 
     %% =========================================================
-    %% LOCAL AGENT
+    %% 2. LOCAL ENVIRONMENT (PRIVACY, CONTROL & MEMORY)
     %% =========================================================
 
-    subgraph LOCAL["LOCAL ENVIRONMENT — Privacy & Execution"]
+    subgraph LOCAL["LOCAL ON-DEVICE ENVIRONMENT — Perception, Privacy & Control Gate"]
 
-        subgraph INTERFACE["Local Interface"]
-            TaskInput["Natural Language Task"]
-            TaskState["Task State / Session State"]
-            ContextCapture["Browser Context Capture"]
+        subgraph BROWSER_OBSERVE["Local Browser Observer"]
+            UserBrowser["User Browser (Chromium / CDP)"]
+            DOMTree["Raw DOM Tree & A11y Tree"]
+            ViewportImg["Raw Viewport Screenshot"]
+            ContextCapture["Context Capture Processor"]
         end
 
-        subgraph BROWSER["Local Browser Control"]
-            Browser["User Browser"]
-            DOM["DOM / Accessibility Tree"]
-            Screenshot["Browser Screenshot"]
-
-            BrowserActions["Browser Actions<br/>Click / Type / Scroll / Navigate"]
-        end
-
-        subgraph PRIVACY["Dual-Mode Privacy Engine"]
+        subgraph DUAL_PRIVACY["Innovative Dual-Engine Privacy Gate"]
             DOMParser["DOM & Screenshot Extractor"]
             ModeRouter{"Privacy Mode Router"}
 
-            subgraph STANDARD_MODE["Standard Mode (99% Tasks — <5ms)"]
-                RegexEngine["100+ Entity Group Pattern Engine<br/>(Email, Pass, Card, OTP, SSH Keys)"]
-                FastNER["Fast Local NER & Vision Masker"]
+            subgraph STANDARD_MODE["Standard Mode (99% Tasks — <5ms Overhead)"]
+                RegexEngine["100+ Entity Group Pattern Engine<br/>(Email, Password, Card, OTP, SSH Keys)"]
+                FastNER["Fast Local NER & Vision Masker<br/>(ONNX Runtime Web / WASM)"]
             end
 
-            subgraph ADVANCED_MODE["Advanced Mode (1% Crypto/Enterprise)"]
-                HTMLCleaner["HTML Script & Noise Stripper"]
+            subgraph ADVANCED_MODE["Advanced Mode (1% Crypto/Enterprise Workflows)"]
+                HTMLCleaner["HTML Script & Style Noise Stripper"]
                 DOMTreeBuilder["JSON DOM Tree Builder"]
                 LocalLLMInference["On-Device Local LLM Inference<br/>(WASM / WebGPU)"]
             end
 
             Redactor["Sanitization & Redaction Engine"]
-
-            SanitizedDOM["Sanitized DOM"]
-            SanitizedImage["Sanitized Screenshot"]
-            SceneGraph["Sanitized Scene / Element Graph"]
+            SanitizedScene["Sanitized Scene Graph & DOM Tree"]
+            PrivacyGate["Privacy Gate<br/>(Zero Raw PII Outbound)"]
         end
 
-        subgraph LOCAL_AGENT["Local Agent Controller"]
-            LocalManager["Local Manager<br/>Validate + Decide"]
-            CommandValidator["Command Validator"]
-            PolicyEngine["Security / Permission Policy"]
+        subgraph LOCAL_CONTROLLER["Local Controller & Action Gate"]
+            LocalManager["Local Manager Controller"]
+            PolicyEngine["Security Policy & Allowlist Verifier"]
+            BrowserExecutor["Browser Executor (Click / Type / Scroll)"]
+            HITLGate["Human-in-the-Loop (HITL) Gate"]
         end
 
-        subgraph EXECUTION["Local Tool Execution"]
-            BrowserExecutor["Browser Executor"]
-
-            WebTools["Local Browser Tools"]
-            FileTools["Local File Tools"]
-            SystemTools["Local System Tools"]
-
-            ResultCapture["Execution Result"]
-        end
-
-        subgraph MEMORY["Local Memory & State"]
-            ConversationManager["Conversation Manager"]
-            SQLite["SQLite<br/>Active Sessions / Archives"]
-
-            VectorMemory["Local Vector Memory"]
-            Qdrant["Qdrant<br/>Semantic + Episodic Memory"]
+        subgraph LOCAL_MEMORY["Local Memory & Storage"]
+            SQLiteDB[("SQLite Database<br/>(Active Sessions & State)")]
+            QdrantDB[("Qdrant Vector DB<br/>(Episodic & Semantic Memory)")]
         end
 
     end
 
 
     %% =========================================================
-    %% CLOUD
+    %% 3. CLOUD REASONING BACKEND
     %% =========================================================
 
-    subgraph CLOUD["CLOUD ENVIRONMENT — Reasoning Only"]
-
-        subgraph GATEWAY["Cloud Gateway"]
-            APIGateway["API Gateway / FastAPI"]
-            Auth["Authentication / Session"]
-        end
-
-        subgraph AGENT_CORE["Cloud Agent Reasoning"]
-
-            StateGraph["LangGraph<br/>Agent State Graph"]
-
-            Planner["Planner / Task Decomposition"]
-
-            CapabilityRouter["Capability Router"]
-
-            ToolSelector["Tool Selection"]
-
-            CloudLLM["Cloud LLM<br/>High-End Reasoning Model"]
-
-        end
-
-        subgraph CLOUD_CONTEXT["Sanitized Context"]
-            Prompt["User Prompt"]
-            SanitizedContext["Sanitized DOM + Screenshot<br/>Scene Graph + Task State"]
-        end
-
-        subgraph RESPONSE["Agent Response"]
-            FinalAnswer["Final Answer"]
-            BrowserCommand["Structured Browser Command"]
-        end
-
+    subgraph CLOUD["CLOUD REASONING BACKEND — Privacy Secured"]
+        APIGateway["API Gateway (FastAPI / REST)"]
+        StateGraph["LangGraph StateGraph Workflow"]
+        TaskPlanner["Task Decomposition & Planner Node"]
+        CloudVLM["Cloud VLM / Reasoning Model<br/>(Qwen2.5-VL / Claude 3.5 Sonnet)"]
+        ActionCommand["Structured Action Command Vector"]
     end
 
 
     %% =========================================================
-    %% USER -> LOCAL
+    %% FLOW CONNECTIONS
     %% =========================================================
 
-    User --> Extension
-    Extension --> TaskInput
-    TaskInput --> TaskState
-    TaskState --> ConversationManager
+    TaskQueue --> ContextCapture
+    UserBrowser --> DOMTree
+    UserBrowser --> ViewportImg
 
-    Extension --> ContextCapture
-    ContextCapture --> Browser
-
-
-    %% =========================================================
-    %% BROWSER -> PRIVACY LAYER
-    %% =========================================================
-
-    Browser --> DOM
-    Browser --> Screenshot
-
-    DOM --> DOMParser
-    Screenshot --> ScreenshotParser
-
-    DOMParser --> SensitiveDetector
-    DOMParser --> PIIDetector
-
-    ScreenshotParser --> PIIDetector
-    ScreenshotParser --> LocalVision
-
-    LocalLLM --> PIIDetector
-    LocalLLM --> SensitiveDetector
-
-    PIIDetector --> Redactor
-    SensitiveDetector --> Redactor
-
-    Redactor --> SanitizedDOM
-    Redactor --> SanitizedImage
-
-    SanitizedDOM --> SceneGraph
-    SanitizedImage --> SceneGraph
-
-
-    %% =========================================================
-    %% LOCAL MEMORY
-    %% =========================================================
-
-    ConversationManager <--> SQLite
-    ConversationManager <--> VectorMemory
-    VectorMemory <--> Qdrant
-
-    TaskState --> ConversationManager
-
-
-    %% =========================================================
-    %% SANITIZED DATA -> CLOUD
-    %% =========================================================
-
-    TaskInput --> Prompt
-
-    Prompt --> APIGateway
-    SceneGraph --> SanitizedContext
-    TaskState --> SanitizedContext
-
-    SanitizedContext --> APIGateway
-
-    APIGateway --> Auth
-    Auth --> StateGraph
-
-    StateGraph --> Planner
-    Planner --> CapabilityRouter
-    CapabilityRouter --> ToolSelector
-
-    Prompt --> CloudLLM
-    SanitizedContext --> CloudLLM
-    ToolSelector --> CloudLLM
-
-
-    %% =========================================================
-    %% CLOUD REASONING
-    %% =========================================================
-
-    CloudLLM --> BrowserCommand
-    CloudLLM --> FinalAnswer
-
-
-    %% =========================================================
-    %% CLOUD -> LOCAL
-    %% =========================================================
-
-    BrowserCommand --> LocalManager
-    FinalAnswer --> LocalManager
-
-    LocalManager --> CommandValidator
-    CommandValidator --> PolicyEngine
-
-    PolicyEngine --> BrowserExecutor
-
-
-    %% =========================================================
-    %% LOCAL EXECUTION
-    %% =========================================================
-
-    BrowserExecutor --> BrowserActions
-
-    BrowserActions --> Browser
-
-    BrowserExecutor --> WebTools
-    BrowserExecutor --> FileTools
-    BrowserExecutor --> SystemTools
-
-    WebTools --> ResultCapture
-    FileTools --> ResultCapture
-    SystemTools --> ResultCapture
-
-    ResultCapture --> LocalManager
-
-
-    %% =========================================================
-    %% EXECUTION -> UPDATED STATE
-    %% =========================================================
-
-    BrowserActions --> DOM
-    BrowserActions --> Screenshot
-
-    DOM --> ContextCapture
-    Screenshot --> ContextCapture
+    DOMTree --> ContextCapture
+    ViewportImg --> ContextCapture
 
     ContextCapture --> DOMParser
-    ContextCapture --> ScreenshotParser
+    DOMParser --> ModeRouter
 
+    ModeRouter -- "99% Routine Tasks" --> RegexEngine --> FastNER --> Redactor
+    ModeRouter -- "1% Enterprise/Crypto" --> HTMLCleaner --> DOMTreeBuilder --> LocalLLMInference --> Redactor
 
-    %% =========================================================
-    %% FINAL RESULT
-    %% =========================================================
+    Redactor --> SanitizedScene
+    SanitizedScene --> PrivacyGate
 
-    LocalManager --> Extension
-    Extension --> User
+    TaskQueue <--> SQLiteDB
+    TaskQueue <--> QdrantDB
+
+    PrivacyGate -- "Sanitized DOM + Blurred Viewport (<EMAIL>, <PASSWD>)" --> APIGateway
+    APIGateway --> StateGraph
+    StateGraph --> TaskPlanner
+    TaskPlanner --> CloudVLM
+    CloudVLM --> ActionCommand
+
+    ActionCommand --> LocalManager
+    LocalManager --> PolicyEngine
+    PolicyEngine -- "Approved Action" --> BrowserExecutor
+    PolicyEngine -- "Sensitive Operation" --> HITLGate
+    HITLGate -- "User Authorizes" --> BrowserExecutor
+
+    BrowserExecutor --> UserBrowser
 
 
     %% =========================================================
     %% STYLING (LIGHT THEME PALETTE)
     %% =========================================================
 
-    classDef local fill:#F0FDF4,stroke:#16A34A,stroke-width:2px,color:#064E3B
-    classDef privacy fill:#FFFBEB,stroke:#D97706,stroke-width:2px,color:#78350F
-    classDef cloud fill:#EFF6FF,stroke:#2563EB,stroke-width:2px,color:#1E3A8A
-    classDef execution fill:#FDF2F8,stroke:#DB2777,stroke-width:2px,color:#831843
-    classDef memory fill:#F5F3FF,stroke:#7C3AED,stroke-width:2px,color:#4C1D95
+    classDef clientStyle fill:#F0FDF4,stroke:#16A34A,stroke-width:2px,color:#064E3B;
+    classDef privacyStyle fill:#FFFBEB,stroke:#D97706,stroke-width:2px,color:#78350F;
+    classDef standardStyle fill:#ECFDF5,stroke:#059669,stroke-width:1.5px,color:#064E3B;
+    classDef advancedStyle fill:#FEF2F2,stroke:#DC2626,stroke-width:1.5px,color:#7F1D1D;
+    classDef cloudStyle fill:#EFF6FF,stroke:#2563EB,stroke-width:2px,color:#1E3A8A;
+    classDef execStyle fill:#FAF5FF,stroke:#7C3AED,stroke-width:2px,color:#4C1D95;
+    classDef memoryStyle fill:#F5F3FF,stroke:#8B5CF6,stroke-width:2px,color:#4C1D95;
 
-    class Browser,DOM,Screenshot,BrowserActions,Extension local
-    class PIIDetector,SensitiveDetector,Redactor,SanitizedDOM,SanitizedImage,SceneGraph,LocalLLM,LocalVision,ModeRouter,RegexEngine,FastNER,HTMLCleaner,DOMTreeBuilder,LocalLLMInference privacy
-    class CloudLLM,StateGraph,Planner,CapabilityRouter,ToolSelector,APIGateway cloud
-    class BrowserExecutor,WebTools,FileTools,SystemTools,CommandValidator,PolicyEngine execution
-    class SQLite,Qdrant,ConversationManager,VectorMemory memory
+    class User,ExtUI,TaskQueue clientStyle;
+    class UserBrowser,DOMTree,ViewportImg,ContextCapture,DOMParser,ModeRouter,Redactor,SanitizedScene,PrivacyGate privacyStyle;
+    class RegexEngine,FastNER standardStyle;
+    class HTMLCleaner,DOMTreeBuilder,LocalLLMInference advancedStyle;
+    class APIGateway,StateGraph,TaskPlanner,CloudVLM,ActionCommand cloudStyle;
+    class LocalManager,PolicyEngine,BrowserExecutor,HITLGate execStyle;
+    class SQLiteDB,QdrantDB memoryStyle;
 ```
 
 ---
