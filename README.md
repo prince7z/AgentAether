@@ -302,35 +302,22 @@ graph TD
 ### Implementation Process Flow Diagram
 
 ```mermaid
-%%{init: {'theme': 'default', 'themeVariables': { 'fontSize': '13px', 'fontFamily': 'Segoe UI, Helvetica, Arial, sans-serif' }}}%%
 sequenceDiagram
     autonumber
     actor User as User
     participant Ext as Local Interface (Extension)
-    participant Privacy as Local Privacy Layer (Dual Engine)
-    participant LocalLLM as Local LLM Engine (WASM/WebGPU)
+    participant Privacy as Local Privacy Layer (NER/OCR)
     participant Gate as Privacy Gate
     participant Cloud as Cloud Agent (FastAPI / VLM)
     participant LocalMgr as Local Control Gate (Manager)
     participant Exec as Browser Executor
-
     User->>Ext: Submit Natural Language Task
-    Ext->>Ext: Capture Current Viewport Screenshot + DOM
+    Ext->>Ext: Capture Current Screen + DOM
     Ext->>Privacy: Send Raw DOM + Viewport Screenshot
-
-    alt Standard Mode (99% Routine Tasks — <5ms Overhead)
-        Privacy->>Privacy: Match against 100+ Entity Group Pattern Engine (Email, Pass, Card, OTP, SSH Keys)
-        Privacy->>Privacy: Redact Matching Text Nodes & Apply Canvas Face Blur
-    else Advanced Mode (1% Confidential/Crypto Workflows)
-        Privacy->>Privacy: Strip HTML Scripts, Style Blocks & DOM Noise
-        Privacy->>Privacy: Build Clean JSON DOM Tree Representation
-        Privacy->>LocalLLM: Pass JSON DOM Tree to Local LLM for Contextual Privacy Classification
-        LocalLLM-->>Privacy: Return Confidential Node Selectors & Secret Elements
-        Privacy->>Privacy: Prune Confidential DOM Nodes & Mask Sensitive Screenshot Regions
-    end
-
+    Privacy->>Privacy: Detect PII (NER + Regex + OCR + Vision)
+    Privacy->>Privacy: Mask Sensitive Text & Blur Face Regions
     Privacy->>Gate: Generate Sanitized Context & Scene Graph
-    Gate->>Cloud: Transmit Sanitized Context + Prompt (Zero Raw PII Outbound)
+    Gate->>Cloud: Transmit Sanitized Context + Prompt (No Raw PII)
     Cloud->>Cloud: VLM Reason / Plan Next Action Step
     Cloud->>LocalMgr: Return Structured Command OR Final Answer
     LocalMgr->>LocalMgr: Validate Command against Security Policy
