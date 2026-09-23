@@ -55,6 +55,25 @@ graph LR
     class LocalControlGate,BrowserExecution execStyle;
 ```
 
+### Visual Perception & Real-Time Sanitization in Action
+
+Below is a live demonstration comparing what the user sees locally on their browser versus what the cloud agent perceives after passing through the **AgentO₃ On-Device Sanitization Layer**:
+
+#### 1. User View (Raw Un-Sanitized Input)
+The user fills out a sensitive registration form containing personal credentials, phone numbers, email addresses, passwords, credit card numbers, and a biometric photo.
+
+| User View: Form Credentials (Top Section) | User View: Photo & Submission (Bottom Section) |
+| :---: | :---: |
+| ![User View - Top Form](public/screenshots/user_pov.png) | ![User View - Bottom Form](public/screenshots/user_pov2.png) |
+
+#### 2. Agent Perception View (What the Agent Sees After Sanitization)
+Before any screenshot or DOM state is transmitted to cloud models, the **AgentO₃ Local Privacy Gate** sanitizes the payload on-device:
+- **Semantic Text Redaction**: Replaces raw sensitive inputs (`narendra@pmo.gov.in`, `987654321`, `******`) with red semantic privacy placeholders (`<user mail>`, `<user phone>`, `<user pass>`).
+- **Real-Time Biometric Blurring**: Detects facial regions in photos and applies local visual canvas blurring (`<FACE_BLURRED>`).
+- **Zero Raw PII Outbound**: Transmits strictly sanitized context graphs and masked visual frames to cloud reasoning models.
+
+![Agent Perception View After Sanitization](public/screenshots/agent_pov.png)
+
 ---
 
 ## Section 2: System Vulnerabilities, Privacy Leakage Metrics & Statistical Loss Analysis
