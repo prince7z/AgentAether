@@ -115,7 +115,9 @@ The rapid deployment of autonomous browser agents and LLM-driven web automation 
 
 ## Section 3: Product Demo
 
-[![AgentO3 Product Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+[![AgentO3 Product Demo](https://img.youtube.com/vi/NDlcPcdMWMg/maxresdefault.jpg)](https://youtu.be/NDlcPcdMWMg)
+
+*Click the image above or [watch the full AgentO3 product demo on YouTube](https://youtu.be/NDlcPcdMWMg).*
 
 
 ## Section 4: Technology Stack
