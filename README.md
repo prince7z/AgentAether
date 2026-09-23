@@ -94,7 +94,12 @@ The rapid deployment of autonomous browser agents and LLM-driven web automation 
 
 ---
 
-## Section 3: Technology Stack
+## Section 3: Product Demo
+
+[![AgentO3 Product Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+
+
+## Section 4: Technology Stack
 
 | Component Layer | Technologies & Frameworks | Description & Purpose |
 | :--- | :--- | :--- |
@@ -108,31 +113,9 @@ The rapid deployment of autonomous browser agents and LLM-driven web automation 
 | **Cloud Models & Reasoning** | Qwen2.5-VL, Claude 3.5 Sonnet / GPT-4o, OpenRouter API | High-end Vision-Language Models for task decomposition, navigation planning, and routing |
 | **Command Validation & Policy** | Local Control Gate, Action Allowlist Engine, Security Policies | Validates every cloud-generated browser command against user permissions prior to execution |
 | **Local State & Memory** | SQLite, Qdrant (Local Vector DB) | Encrypted transactional session state and episodic/semantic memory vector store |
-
 ---
 
-## Section 4: Product Demo
-
-[![AgentO3 Product Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
-
-*Click the thumbnail above to watch the full AgentO₃ product walkthrough & live PII redaction demonstration on YouTube. (Replace `YOUR_VIDEO_ID` with the actual YouTube video ID).*
-
----
-
-## Section 5: Problem Statement
-
-### Problem Statement ID 26171: On-device Visual Perception for Light-weight Browser Agents
-
-Modern web browser agents rely heavily on multimodal cloud LLMs/VLMs to understand web interfaces and perform tasks on behalf of users. However, this architectural paradigm introduces major security, privacy, and economic challenges:
-
-1. **Uncontrolled PII Exposure**: Current agents capture raw screen pixels and full un-redacted DOM hierarchies. When executing tasks on financial portals, emails, or enterprise dashboards, sensitive entities (passwords, credit card numbers, personal identifiers, face images) are routinely sent to cloud servers.
-2. **Severe Data Breach Risks**: Transmitting raw web sessions increases breach vulnerability. According to the IBM Cost of a Data Breach Report 2026, the average data breach cost reached **₹25.5 crore in India** and **$4.99 million globally**, with **60% of breaches involving human elements**.
-3. **Prompt Injection & Execution Hazards**: Malicious websites can inject adversarial prompts into visible page text or hidden DOM attributes. Benchmarks show **94.4% of AI agents** are vulnerable to prompt injection, which can trick cloud VLMs into executing unauthorized actions (e.g., bank transfers, data exfiltration).
-4. **Bandwidth & Compute Overhead**: Streaming high-resolution raw screenshots and massive raw DOM payloads for every step wastes client bandwidth and inflates cloud processing costs by up to 600%.
-
----
-
-## Section 6: Solution & System Architecture
+## Section 5: Solution & System Architecture
 
 ### The AgentO₃ Approach
 
@@ -332,7 +315,7 @@ sequenceDiagram
 
 ---
 
-## Section 7: Project Directory Structure
+## Section 6: Project Directory Structure
 
 > **Development Status Note**:  
 > The codebase is actively evolving during development. Below is the complete target directory structure representing the full end-to-end architecture (Client Extension + On-Device Privacy Layer + Local Manager + Cloud Agent Backend).
@@ -388,7 +371,7 @@ openclaw/
 
 ---
 
-## Section 8: Features & Solution Uniqueness
+## Section 7: Features & Solution Uniqueness
 
 - **Adaptive Dual-Mode Privacy Engine**: Integrates a **<5ms Standard Rule Engine** for 99% of routine tasks (forms, e-commerce, scraping) with an **Advanced Local LLM Engine** for 1% confidential enterprise/cryptographic workflows.
 - **Hybrid Perception**: Integrates machine-readable structured DOM trees with visual scene perception, ensuring no element is missed.
@@ -399,7 +382,7 @@ openclaw/
 
 ---
 
-## Section 9: Feasibility, Viability & Risk Mitigation
+## Section 8: Feasibility, Viability & Risk Mitigation
 
 ### Feasibility Analysis
 
@@ -425,7 +408,7 @@ openclaw/
 
 ---
 
-## Section 10: Impact & Benefits
+## Section 9: Impact & Benefits
 
 ### Target Audience Impact
 - **Safer AI Browsing**: Enables AI-assisted web workflows without routinely exposing private user screens to third-party cloud servers.
@@ -443,7 +426,7 @@ openclaw/
 
 ---
 
-## Section 11: Research & References
+## Section 10: Research & References
 
 1. **WebArena** — *A Realistic Web Environment for Building Autonomous Agents*  
    [https://arxiv.org/abs/2307.13854](https://arxiv.org/abs/2307.13854)
